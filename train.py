@@ -131,6 +131,7 @@ def main():
     plt.close()
     print(f"Saved loss curve to {loss_curve_path}")
 
+    os.makedirs(config.METRICS_DIR, exist_ok=True)
     with open(os.path.join(config.METRICS_DIR, "training_history.json"), "w") as f:
         json.dump(history, f, indent=2)
 
