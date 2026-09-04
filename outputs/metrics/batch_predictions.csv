@@ -1,0 +1,6 @@
+sample_id,true_disaster_type,true_severity,pred_disaster_type,pred_severity,disaster_confidence,severity_confidence
+hurricane-florence_00000086,Flood,Severe,Flood,Severe,0.7610199451446533,0.587436854839325
+hurricane-florence_00000088,Flood,Severe,Flood,Severe,0.7656624913215637,0.653441846370697
+hurricane-florence_00000091,Flood,Low,Flood,Severe,0.7651994228363037,0.5794873833656311
+hurricane-florence_00000094,Flood,Low,Flood,Severe,0.7654520869255066,0.5415042042732239
+hurricane-florence_00000096,Flood,Low,Flood,Severe,0.7604371905326843,0.4766387641429901
