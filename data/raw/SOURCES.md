@@ -48,6 +48,36 @@ files came from, cloned during this session (2026-09-04).
   check, and is excluded from training (a pseudo-Siamese model requires a
   pre/post pair). It does not count toward any class's sample floor.
 
+### `kahramanmaras-earthquake_<zone>_<quadkey>` (60 samples: 20 Low / 20 Moderate / 20 Severe, pre+post PNG 1024x1024)
+- Disaster: **Earthquake** (2023 Kahramanmaras, Turkiye earthquake)
+- Source: **Maxar Open Data Program** (`https://maxar-opendata.s3.amazonaws.com`,
+  CC BY-NC-4.0), event `Kahramanmaras-turkey-earthquake-23`. Unlike
+  xview2.org/Kaggle/HuggingFace/Zenodo, this public S3 bucket is reachable
+  from this sandbox (see `DATA_REPORT.md`).
+- Fetched by `fetch_maxar_earthquake.py`, which actually runs in this
+  environment (verified: 60/60 samples downloaded successfully in this
+  session). Images are real pre-event and post-event Maxar
+  WorldView/GeoEye visual (RGB) tiles, read at 1024x1024 directly from the
+  source Cloud-Optimized GeoTIFFs via HTTP range requests (GDAL
+  `/vsicurl/` + COG overviews) -- confirmed as genuine satellite photos
+  (farmland, roads, villages, forest, visible cloud cover) by direct visual
+  inspection, not a processed/rendered product.
+- Severity is derived from Maxar's own official, published
+  `building_change` GeoPackage layer for this event (AI-detected building
+  change polygons between the same pre/post image pair, each polygon typed
+  "removed", "building-to-building change", "new", or "no change" by
+  Maxar). Per quadkey: `damage_ratio = count(removed or changed) /
+  count(all non-nodata polygons)`; quadkeys are binned into Low/Moderate/
+  Severe by tertiles of `damage_ratio` across the 79 real candidate
+  quadkeys that had both a real pre- and post-event image (a standard way
+  to turn a continuous real signal into 3 ordinal tiers without picking an
+  arbitrary absolute cutoff). This is a real, Maxar-published, per-tile
+  damage signal -- not an invented one -- though it is coarser than xBD's
+  per-building manual annotation (see `DATA_REPORT.md` for the distinction
+  and how it's flagged as a lower-confidence label tier than xBD's).
+- Full per-sample provenance (`sample_id`, exact pre/post acquisition
+  dates, `damage_ratio`) is in `data/raw/maxar_earthquake/labels.csv`.
+
 ## Explicitly NOT included (and why)
 
 - `hurricane-harvey_00000000/1/2` patches from
@@ -61,8 +91,21 @@ files came from, cloned during this session (2026-09-04).
   are colorized *segmentation-mask* renders (PIL mode `P`/`1`, palette /
   binary), not raw satellite RGB imagery, so they fail the "real satellite
   photo, not a flat-color block" visual check by construction. Excluded.
-- Earthquake and landslide: no real, verifiable pixel data reachable from
-  this sandbox at all (see `DATA_REPORT.md`).
+- Landslide: real pre/post imagery for two real landslide events (PNG
+  2024, Georgia 2023) is reachable via the same Maxar Open Data bucket
+  (`events/PNG-Landslide-June24/`, `events/shovi-georgia-landslide-8Aug23/`)
+  and was confirmed to exist, but neither event has an official per-tile
+  damage/severity layer analogous to the earthquake's `building_change`
+  GeoPackage, so no real severity could be derived for them this session
+  (see `DATA_REPORT.md` for what was checked and the Phase-2 plan).
+- Wildfire: similarly, real pre/post imagery is reachable for several real
+  wildfire events (LA Jan 2025, Maui Aug 2023, SmokeHouse Creek TX Mar
+  2024, etc.) via Maxar Open Data -- and post-event smoke is visibly
+  present in some tiles, confirming real fire activity -- but there is no
+  official per-tile burn-severity layer, and a from-scratch burn-index
+  (dNBR/dNDVI) computation attempted this session on raw, uncalibrated
+  digital-number values did not produce a reliable enough signal to trust
+  as a real label (see `DATA_REPORT.md`).
 
 ## Full xBD official label set (reference only, not used for pixels)
 

@@ -104,25 +104,25 @@ def scan_xbd():
     return rows, skipped
 
 
-def scan_landslide():
-    """Scan data/raw/landslide for a labels.csv describing real supplementary
-    landslide pre/post pairs + severity (Sentinel-1 SAR or equivalent real
-    imagery). Returns [] if nothing has been placed there yet -- this is the
-    documented drop-in point for real landslide data (see DATA_REPORT.md).
+def scan_extra_source(dir_path, default_disaster_type, missing_msg):
+    """Scan an arbitrary data/raw/<name>/ folder for a labels.csv describing
+    real supplementary pre/post pairs + severity from a non-xBD real source
+    (e.g. a real landslide inventory, or real Maxar Open Data imagery for an
+    earthquake/wildfire event -- see fetch_maxar_earthquake.py). This is the
+    generic drop-in point any additional real dataset can plug into.
 
-    Expected data/raw/landslide/labels.csv columns:
-      sample_id, pre_image_path, post_image_path, severity, source
-    (paths relative to data/raw/landslide/).
+    Expected labels.csv columns: sample_id, pre_image_path, post_image_path,
+    severity, source, [disaster_type] (paths relative to dir_path; if a row
+    omits disaster_type, `default_disaster_type` is used).
     """
-    labels_csv = os.path.join(config.RAW_LANDSLIDE_DIR, "labels.csv")
+    labels_csv = os.path.join(dir_path, "labels.csv")
     if not os.path.exists(labels_csv):
-        return [], [("landslide", "data/raw/landslide/labels.csv not found -- no real landslide "
-                                   "source was reachable from this environment; see DATA_REPORT.md")]
+        return [], [(os.path.basename(dir_path), missing_msg)]
     df = pd.read_csv(labels_csv)
     rows, skipped = [], []
     for _, r in df.iterrows():
-        pre = os.path.join(config.RAW_LANDSLIDE_DIR, r["pre_image_path"])
-        post = os.path.join(config.RAW_LANDSLIDE_DIR, r["post_image_path"])
+        pre = os.path.join(dir_path, r["pre_image_path"])
+        post = os.path.join(dir_path, r["post_image_path"])
         if not (os.path.exists(pre) and os.path.exists(post)):
             skipped.append((r["sample_id"], "listed in labels.csv but image file(s) missing"))
             continue
@@ -130,12 +130,16 @@ def scan_landslide():
         if severity not in config.SEVERITY_LEVELS:
             skipped.append((r["sample_id"], f"invalid severity '{severity}'"))
             continue
+        disaster_type = r.get("disaster_type", default_disaster_type) or default_disaster_type
+        if disaster_type not in config.DISASTER_TYPES:
+            skipped.append((r["sample_id"], f"invalid disaster_type '{disaster_type}'"))
+            continue
         rows.append({
             "sample_id": r["sample_id"],
-            "disaster_event": r.get("source", "landslide"),
-            "disaster_type": "Landslide",
+            "disaster_event": r.get("source", os.path.basename(dir_path)),
+            "disaster_type": disaster_type,
             "severity": severity,
-            "joint_label": f"Landslide_{severity}",
+            "joint_label": f"{disaster_type}_{severity}",
             "pre_image_path": os.path.relpath(pre, config.ROOT_DIR),
             "post_image_path": os.path.relpath(post, config.ROOT_DIR),
             "num_buildings": None,
@@ -143,7 +147,7 @@ def scan_landslide():
             "sensor": r.get("sensor"),
             "gsd": r.get("gsd"),
             "capture_date": r.get("capture_date"),
-            "source": r.get("source", "real supplementary landslide dataset"),
+            "source": r.get("source", os.path.basename(dir_path)),
         })
     return rows, skipped
 
@@ -215,9 +219,17 @@ def main():
     args = parser.parse_args()
 
     xbd_rows, xbd_skipped = scan_xbd()
-    ls_rows, ls_skipped = scan_landslide()
-    rows = xbd_rows + ls_rows
-    skipped = xbd_skipped + ls_skipped
+    ls_rows, ls_skipped = scan_extra_source(
+        config.RAW_LANDSLIDE_DIR, "Landslide",
+        "data/raw/landslide/labels.csv not found -- no real landslide source "
+        "was reachable from this environment; see DATA_REPORT.md")
+    eq_rows, eq_skipped = scan_extra_source(
+        config.RAW_MAXAR_EARTHQUAKE_DIR, "Earthquake",
+        "data/raw/maxar_earthquake/labels.csv not found -- run "
+        "`python fetch_maxar_earthquake.py` to fetch real Maxar Open Data "
+        "earthquake imagery; see DATA_REPORT.md")
+    rows = xbd_rows + ls_rows + eq_rows
+    skipped = xbd_skipped + ls_skipped + eq_skipped
 
     if not rows:
         raise SystemExit(
