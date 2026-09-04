@@ -1,0 +1,68 @@
+{
+  "target_per_class": 15,
+  "floor_per_class": 10,
+  "classes": {
+    "Flood_Low": {
+      "count": 3,
+      "meets_floor": false,
+      "meets_target": false
+    },
+    "Flood_Moderate": {
+      "count": 0,
+      "meets_floor": false,
+      "meets_target": false
+    },
+    "Flood_Severe": {
+      "count": 2,
+      "meets_floor": false,
+      "meets_target": false
+    },
+    "Earthquake_Low": {
+      "count": 20,
+      "meets_floor": true,
+      "meets_target": true
+    },
+    "Earthquake_Moderate": {
+      "count": 20,
+      "meets_floor": true,
+      "meets_target": true
+    },
+    "Earthquake_Severe": {
+      "count": 20,
+      "meets_floor": true,
+      "meets_target": true
+    },
+    "Wildfire_Low": {
+      "count": 0,
+      "meets_floor": false,
+      "meets_target": false
+    },
+    "Wildfire_Moderate": {
+      "count": 0,
+      "meets_floor": false,
+      "meets_target": false
+    },
+    "Wildfire_Severe": {
+      "count": 0,
+      "meets_floor": false,
+      "meets_target": false
+    },
+    "Landslide_Low": {
+      "count": 0,
+      "meets_floor": false,
+      "meets_target": false
+    },
+    "Landslide_Moderate": {
+      "count": 0,
+      "meets_floor": false,
+      "meets_target": false
+    },
+    "Landslide_Severe": {
+      "count": 0,
+      "meets_floor": false,
+      "meets_target": false
+    }
+  },
+  "all_meet_floor": false,
+  "all_meet_target": false
+}

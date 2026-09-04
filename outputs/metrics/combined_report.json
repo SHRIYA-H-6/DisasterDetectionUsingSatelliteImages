@@ -1,0 +1,87 @@
+{
+  "Flood_Low": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 0
+  },
+  "Flood_Moderate": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 0
+  },
+  "Flood_Severe": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 1
+  },
+  "Earthquake_Low": {
+    "precision": 0.6,
+    "recall": 0.75,
+    "f1-score": 0.6666666667,
+    "support": 4
+  },
+  "Earthquake_Moderate": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 2
+  },
+  "Earthquake_Severe": {
+    "precision": 0.5,
+    "recall": 0.3333333333,
+    "f1-score": 0.4,
+    "support": 3
+  },
+  "Wildfire_Low": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 0
+  },
+  "Wildfire_Moderate": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 0
+  },
+  "Wildfire_Severe": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 0
+  },
+  "Landslide_Low": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 0
+  },
+  "Landslide_Moderate": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 0
+  },
+  "Landslide_Severe": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 0
+  },
+  "accuracy": 0.4,
+  "macro avg": {
+    "precision": 0.0916666667,
+    "recall": 0.0902777778,
+    "f1-score": 0.0888888889,
+    "support": 10
+  },
+  "weighted avg": {
+    "precision": 0.39,
+    "recall": 0.4,
+    "f1-score": 0.3866666667,
+    "support": 10
+  }
+}
