@@ -101,3 +101,24 @@ def plot_confusion_matrix(cm, labels, title, path):
     fig.tight_layout()
     fig.savefig(path, dpi=150, facecolor=SURFACE)
     plt.close(fig)
+
+
+def plot_simple_loss_curve(history, summary, title, path):
+    """Single-loss train vs validation curve with the gap shaded (used for the U-Net)."""
+    fig, ax = plt.subplots(figsize=(8, 4.8), facecolor=SURFACE)
+    _style(ax)
+    e = history.epoch.to_numpy()
+    tr, va = history.train_loss.to_numpy(), history.val_loss.to_numpy()
+    ax.fill_between(e, tr, va, color=GAP_FILL, alpha=0.7, linewidth=0, label="train/val gap")
+    ax.plot(e, tr, color=TRAIN_COLOR, linewidth=2, marker="o", markersize=4, label="train")
+    ax.plot(e, va, color=VAL_COLOR, linewidth=2, marker="o", markersize=4, label="validation")
+    ax.axvline(summary["best_epoch"], color=TEXT_PRIMARY, linestyle="--", linewidth=1)
+    ax.set_xlabel("epoch", color=TEXT_SECONDARY, fontsize=9)
+    ax.set_ylabel("weighted CE + Dice loss", color=TEXT_SECONDARY, fontsize=9)
+    ax.set_title(title, color=TEXT_PRIMARY, fontsize=12, loc="left")
+    ax.legend(frameon=False, fontsize=8, labelcolor=TEXT_SECONDARY)
+    fig.text(0.01, 0.01, f"Best epoch {summary['best_epoch']} (dashed). Clean-eval gap {summary['gap_loss']:+.4f}. "
+             f"{summary['stop_reason']}", color=TEXT_SECONDARY, fontsize=8, ha="left", va="bottom", wrap=True)
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
+    fig.savefig(path, dpi=150, facecolor=SURFACE)
+    plt.close(fig)

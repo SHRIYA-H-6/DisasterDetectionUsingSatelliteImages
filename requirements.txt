@@ -1,0 +1,12 @@
+torch>=2.1
+torchvision>=0.16
+efficientnet_pytorch==0.7.1
+numpy
+pandas
+matplotlib
+scikit-learn
+opencv-python-headless
+folium
+h5py
+tifffile
+pyproj

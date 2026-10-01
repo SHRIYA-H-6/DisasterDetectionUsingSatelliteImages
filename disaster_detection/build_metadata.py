@@ -54,8 +54,10 @@ def scan_xbd(root, geotransforms):
         post_name = f"{stem}_post_disaster.png"
         lon = lat = np.nan
         geo = geotransforms.get(post_name)
+        geo_transform, geo_epsg = "", ""
         if geo:
             lon, lat = apply_gdal_transform(geo[0], 512, 512)
+            geo_transform, geo_epsg = json.dumps(list(geo[0])), 4326
         rows.append(dict(
             sample_id=stem, source="xBD", event=event,
             xbd_disaster_type=label["metadata"]["disaster_type"],
@@ -66,6 +68,8 @@ def scan_xbd(root, geotransforms):
             pre_path=f"train/images/{stem}_pre_disaster.png", post_path=f"train/images/{post_name}",
             target_path=f"train/targets/{stem}_post_disaster_target.png",
             has_pre_image=True, center_lon=lon, center_lat=lat,
+            geo_transform=geo_transform, geo_epsg=geo_epsg,
+            orig_width=label["metadata"]["width"], orig_height=label["metadata"]["height"],
             capture_date=label["metadata"].get("capture_date", ""),
         ))
     return rows
@@ -95,9 +99,9 @@ def scan_bright(root):
         fraction = damaged_px / building_px
         severity = C.severity_from_fraction(fraction, C.XBD_SEVERITY_EDGES)
         lon = lat = np.nan
+        h, w = target.shape[:2]
         transform, epsg = geotiff_transform(target_path)
         if transform is not None:
-            h, w = target.shape[:2]
             lon, lat = to_lonlat(*apply_gdal_transform(transform, w / 2, h / 2), epsg)
         rows.append(dict(
             sample_id=stem, source="BRIGHT", event=event, xbd_disaster_type="",
@@ -107,7 +111,9 @@ def scan_bright(root):
             n_major=int((target == 2).sum()), n_destroyed=int((target == 3).sum()),
             pre_path=f"bright/pre-event/{pre.name}", post_path=f"bright/post-event/{post.name}",
             target_path=f"bright/target/{target_path.name}",
-            has_pre_image=True, center_lon=lon, center_lat=lat, capture_date="",
+            has_pre_image=True, center_lon=lon, center_lat=lat,
+            geo_transform=json.dumps(list(transform)) if transform is not None else "", geo_epsg=epsg or "",
+            orig_width=w, orig_height=h, capture_date="",
         ))
     return rows
 
@@ -136,7 +142,8 @@ def scan_landslide4sense(root):
             n_buildings=0, n_damaged=0, n_minor=0, n_major=0, n_destroyed=0,
             pre_path="", post_path=f"landslide4sense/img/{img_path.name}",
             target_path=f"landslide4sense/mask/{mask_path.name}",
-            has_pre_image=False, center_lon=np.nan, center_lat=np.nan, capture_date="",
+            has_pre_image=False, center_lon=np.nan, center_lat=np.nan, geo_transform="", geo_epsg="",
+            orig_width=mask.shape[1], orig_height=mask.shape[0], capture_date="",
         ))
     return rows
 

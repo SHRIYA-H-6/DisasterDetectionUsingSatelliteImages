@@ -22,7 +22,6 @@ import zipfile
 from collections import defaultdict
 
 import h5py
-import numpy as np
 
 # Upper edges of landslide-pixel-fraction groups; patches with no landslide pixels are skipped.
 BIN_EDGES = [0.02, 0.05, 0.10, 0.20, 0.30, 1.01]
