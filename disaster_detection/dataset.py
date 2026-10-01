@@ -70,6 +70,6 @@ class PairDataset(Dataset):
 def balanced_sampler(df, seed=C.SEED):
     """Sample training tiles with probability inversely proportional to their combined-class size."""
     counts = df.combined_class.value_counts()
-    weights = df.combined_class.map(lambda c: 1.0 / counts[c]).to_numpy()
+    weights = df.combined_class.map(lambda c: 1.0 / counts[c]).to_numpy(dtype=float, copy=True)
     return WeightedRandomSampler(torch.as_tensor(weights, dtype=torch.double), num_samples=len(df),
                                  replacement=True, generator=torch.Generator().manual_seed(seed))
